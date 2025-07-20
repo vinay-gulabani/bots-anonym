@@ -29,7 +29,7 @@ async def bot(user_id, nickname):
                         print(f"[{nickname}] Matched")
 
                     if matched and data.get("type") in ["matched", "message_sent"]:
-                        await asyncio.sleep(45)
+                        await asyncio.sleep(90)
                         await websocket.send(json.dumps({
                             "type": "send_message",
                             "message": f"hi from {nickname}"
