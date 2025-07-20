@@ -1,0 +1,6 @@
+[project]
+name = "echo-bots"
+version = "1.0"
+dependencies = [
+  "websockets"
+]
