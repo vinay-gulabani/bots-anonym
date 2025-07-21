@@ -21,6 +21,9 @@ async def bot(user_id, nickname, send_messages=False):
                 }))
 
                 matched = False
+                # Keep track of when last message was sent (only for send_messages=True)
+                last_sent = None
+
                 while True:
                     message = await websocket.recv()
                     data = json.loads(message)
@@ -29,13 +32,16 @@ async def bot(user_id, nickname, send_messages=False):
                         matched = True
                         print(f"[{nickname}] Matched!")
 
+                    # Only BotOne sends messages every 60s
                     if matched and send_messages:
-                        await asyncio.sleep(60)  # Wait 60 seconds
-                        await websocket.send(json.dumps({
-                            "type": "send_message",
-                            "message": f"Hi from {nickname} 👋"
-                        }))
-                        print(f"[{nickname}] Sent message")
+                        now = asyncio.get_event_loop().time()
+                        if not last_sent or (now - last_sent >= 60):
+                            await websocket.send(json.dumps({
+                                "type": "send_message",
+                                "message": f"Hi from {nickname} 👋"
+                            }))
+                            print(f"[{nickname}] Sent message")
+                            last_sent = now
 
         except Exception as e:
             print(f"[{nickname}] Disconnected: {e}")
@@ -43,8 +49,8 @@ async def bot(user_id, nickname, send_messages=False):
 
 async def main():
     await asyncio.gather(
-        bot(BOT1_ID, "BotOne", send_messages=True),   # ✅ Only BotOne sends messages
-        bot(BOT2_ID, "BotTwo", send_messages=False)   # ❌ BotTwo only listens
+        bot(BOT1_ID, "BotOne", send_messages=True),   # ✅ Will send messages every 60s
+        bot(BOT2_ID, "BotTwo", send_messages=False)   # ❌ Won’t send messages
     )
 
 if __name__ == "__main__":
