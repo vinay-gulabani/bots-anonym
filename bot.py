@@ -40,7 +40,7 @@ async def bot(user_id, nickname, send_messages=False):
                                 "type": "send_message",
                                 "message": f"Hi from {nickname} 👋"
                             }))
-                            print(f"[{nickname}] Sent message")
+                            print(f"[{nickname}] Sent message ")
                             last_sent = now
 
         except Exception as e:
@@ -54,4 +54,4 @@ async def main():
     )
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(main())     
