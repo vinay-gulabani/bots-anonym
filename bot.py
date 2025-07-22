@@ -31,7 +31,7 @@ async def bot(user_id, nickname, should_send_messages):
 
                     # Only this bot sends messages
                     if matched and should_send_messages and data.get("type") in ["matched", "message_sent"]:
-                        await asyncio.sleep(60)
+                        await asyncio.sleep(45)
                         await websocket.send(json.dumps({
                             "type": "send_message",
                             "message": f"hi from {nickname}"
