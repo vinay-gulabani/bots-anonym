@@ -1,4 +1,3 @@
-# bot.py
 import asyncio
 import websockets
 import json
@@ -21,16 +20,9 @@ async def bot(user_id, nickname, should_send_messages):
                 }))
 
                 matched = False
-                while True:
-                    message = await websocket.recv()
-                    data = json.loads(message)
 
-                    if data.get("type") == "matched":
-                        matched = True
-                        print(f"[{nickname}] Matched")
-
-                    # Only this bot sends messages
-                    if matched and should_send_messages and data.get("type") in ["matched", "message_sent"]:
+                async def message_sender():
+                    while matched and should_send_messages:
                         await asyncio.sleep(60)
                         await websocket.send(json.dumps({
                             "type": "send_message",
@@ -38,17 +30,25 @@ async def bot(user_id, nickname, should_send_messages):
                         }))
                         print(f"[{nickname}] Sent message")
 
+                while True:
+                    message = await websocket.recv()
+                    data = json.loads(message)
+
+                    if data.get("type") == "matched" and not matched:
+                        matched = True
+                        print(f"[{nickname}] Matched")
+                        if should_send_messages:
+                            asyncio.create_task(message_sender())
+
         except Exception as e:
             print(f"[{nickname}] Disconnected: {e}")
             await asyncio.sleep(5)
 
-
 async def main():
     await asyncio.gather(
-        bot(BOT1_ID, "BotOne", True),   # ✅ This one sends messages
-        bot(BOT2_ID, "BotTwo", False)   # ❌ This one does not send messages
+        bot(BOT1_ID, "BotOne", True),   # ✅ Sends message every 60 seconds
+        bot(BOT2_ID, "BotTwo", False)   # ❌ Does not send messages
     )
-
 
 if __name__ == "__main__":
     asyncio.run(main())
