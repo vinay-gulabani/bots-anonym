@@ -23,7 +23,7 @@ async def bot(user_id, nickname, should_send_messages):
 
                 async def message_sender():
                     while matched and should_send_messages:
-                        await asyncio.sleep(60)
+                        await asyncio.sleep(45)
                         await websocket.send(json.dumps({
                             "type": "send_message",
                             "message": f"hi from {nickname}"
